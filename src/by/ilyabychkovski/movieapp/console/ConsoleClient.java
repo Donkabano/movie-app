@@ -2,50 +2,49 @@ package by.ilyabychkovski.movieapp.console;
 
 import by.ilyabychkovski.movieapp.domain.Movie;
 import by.ilyabychkovski.movieapp.service.MovieService;
+import by.ilyabychkovski.movieapp.service.NoSuchMovieException;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-public class Console {
+public class ConsoleClient {
 
     private final MovieService movieService;
+    private final Scanner scanner;
 
-    public Console(MovieService movieService) {
+    public ConsoleClient(MovieService movieService, Scanner scanner) {
         this.movieService = movieService;
+        this.scanner = scanner;
     }
 
     public void addMovie() {
-        Scanner console = new Scanner(System.in);
-
-        String name = performName(console);
-        LocalDate publishing = performPublishing(console);
+        String name = performName(scanner);
+        LocalDate publishing = performDate(scanner);
 
         Movie movie = new Movie(null, name, publishing);
         movieService.add(movie);
-
-        console.close();
     }
 
     public void updateMovie() {
         printMovies();
-        Scanner console = new Scanner(System.in);
 
-        long id = performId(console);
-        String name = performName(console);
-        LocalDate publishing = performPublishing(console);
-
+        long id = performId(scanner);
+        String name = performName(scanner);
+        LocalDate publishing = performDate(scanner);
         Movie movie = new Movie(id, name, publishing);
-        movieService.update(movie);
 
-        console.close();
+        try {
+            movieService.update(movie);
+            System.out.println("Фильм с id " + id + " был обновлен.");
+        } catch (NoSuchMovieException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     public void printMovie() {
-        Scanner console = new Scanner(System.in);
-
-        long id = performId(console);
+        long id = performId(scanner);
         Optional<Movie> movie = movieService.find(id);
 
         if (movie.isPresent()) {
@@ -53,13 +52,9 @@ public class Console {
         } else {
             System.out.println("Фильм с id " + id + " не найден.");
         }
-
-        console.close();
     }
 
     public void printMovies() {
-        Scanner console = new Scanner(System.in);
-
         List<Movie> movies = movieService.findAll();
         if (!movies.isEmpty()) {
             for (Movie movie : movies) {
@@ -68,32 +63,31 @@ public class Console {
         } else {
             System.out.println("Фильмы не найдены.");
         }
-
-        console.close();
     }
 
     public void deleteMovie() {
-        Scanner console = new Scanner(System.in);
+        long id = performId(scanner);
 
-        long id = performId(console);
-        movieService.delete(id);
-        System.out.println("Фильм с id " + id + " был удален.");
-
-        console.close();
+        try {
+            movieService.delete(id);
+            System.out.println("Фильм с id " + id + " был удален.");
+        } catch (NoSuchMovieException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
-    private long performId(Scanner console) {
+    private long performId(Scanner scanner) {
         System.out.println("Введите id фильма:");
-        return console.hasNextLong() ? console.nextLong() : performId(console);
+        return scanner.hasNextLong() ? scanner.nextLong() : performId(scanner);
     }
 
-    private String performName(Scanner console) {
+    private String performName(Scanner scanner) {
         System.out.println("Введите название фильма:");
-        return console.next();
+        return scanner.next();
     }
 
-    private LocalDate performPublishing(Scanner console) {
+    private LocalDate performDate(Scanner scanner) {
         System.out.println("Введите дату выспуска фильма:");
-        return LocalDate.parse(console.next());
+        return LocalDate.parse(scanner.next());
     }
 }

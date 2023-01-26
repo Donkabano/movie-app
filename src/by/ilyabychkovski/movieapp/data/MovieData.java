@@ -30,18 +30,10 @@ public class MovieData {
     }
 
     public MovieEntity update(MovieEntity movie) {
-        checkMovieOnExisting(movie.getId());
         return moviesMap.replace(movie.getId(), movie);
     }
 
     public void delete(long id) {
-        checkMovieOnExisting(id);
         moviesMap.remove(id);
-    }
-
-    private void checkMovieOnExisting(long id) {
-        if (!moviesMap.containsKey(id)) {
-            throw new RuntimeException("Фильма с индетификатором " + id + " нет в системе");
-        }
     }
 }

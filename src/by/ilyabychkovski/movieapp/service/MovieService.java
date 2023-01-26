@@ -35,10 +35,12 @@ public class MovieService {
     }
 
     public Movie update(Movie movie) {
+        checkMovieOnNotExisting(movie.getId());
         return constructMovie(movieData.update(constructMovieEntity(movie)));
     }
 
     public void delete(long id) {
+        checkMovieOnNotExisting(id);
         movieData.delete(id);
     }
 
@@ -52,5 +54,12 @@ public class MovieService {
 
     private MovieEntity constructMovieEntity(Movie movie) {
         return new MovieEntity(movie.getId(), movie.getName(), movie.getPublishingDate());
+    }
+
+    private void checkMovieOnNotExisting(long id) {
+        Optional<Movie> maybeMovie = find(id);
+        if (maybeMovie.isEmpty()) {
+            throw new NoSuchMovieException(id);
+        }
     }
 }

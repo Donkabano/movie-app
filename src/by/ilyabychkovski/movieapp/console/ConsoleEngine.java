@@ -4,10 +4,12 @@ import java.util.Scanner;
 
 public class ConsoleEngine {
 
-    private final Console console;
+    private final ConsoleClient console;
+    private final Scanner scanner;
 
-    public ConsoleEngine(Console console) {
+    public ConsoleEngine(ConsoleClient console, Scanner scanner) {
         this.console = console;
+        this.scanner = scanner;
     }
 
     public void run() {
@@ -22,30 +24,15 @@ public class ConsoleEngine {
             System.out.println("Если вы хотите удалить фильм, нажмите 5");
             System.out.println("Если вы хотите выйти из приложения, нажмите 6");
 
-            Scanner scanner = new Scanner(System.in);
-
-            int action = scanner.hasNextInt() ? scanner.nextInt() : 0;
+            String action = scanner.hasNext() ? scanner.next() : "";
             switch (action) {
-                case 1:
-                    console.addMovie();
-                    break;
-                case 2:
-                    console.updateMovie();
-                    break;
-                case 3:
-                    console.printMovies();
-                    break;
-                case 4:
-                    console.printMovie();
-                    break;
-                case 5:
-                    console.deleteMovie();
-                    break;
-                case 6:
-                    isRunning = false;
-                    break;
-                default:
-                    System.out.println("Вы ввели некорректную команду.");
+                case "1" -> console.addMovie();
+                case "2" -> console.updateMovie();
+                case "3" -> console.printMovies();
+                case "4" -> console.printMovie();
+                case "5" -> console.deleteMovie();
+                case "6" -> isRunning = false;
+                default -> System.out.println("Вы ввели некорректную команду.");
             }
         }
     }
